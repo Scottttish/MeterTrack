@@ -9,6 +9,8 @@ import Navbar from '../components/Navbar';
 import PaymentCard from '../components/PaymentCard';
 import BasketPanel from '../components/BasketPanel';
 import ProfilePanel from '../components/ProfilePanel';
+import SkeletonCard from '../components/SkeletonCard';
+import IndexOptimizerWidget from '../components/IndexOptimizerWidget';
 
 const LIMIT = 12;
 
@@ -145,7 +147,7 @@ export default function DashboardPage() {
 
                 {loading ? (
                     <div className="cards-grid">
-                        {[...Array(6)].map((_, i) => <div key={i} className="skeleton-card skeleton" style={{ height: 200 }} />)}
+                        {[...Array(LIMIT)].map((_, i) => <SkeletonCard key={i} />)}
                     </div>
                 ) : (
                     <>
@@ -193,6 +195,8 @@ export default function DashboardPage() {
                 onClose={() => setProfileOpen(false)}
                 user={user}
             />
+
+            <IndexOptimizerWidget />
 
             <div className="toast-container">
                 {toasts.map(t => (

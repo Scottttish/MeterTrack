@@ -46,7 +46,7 @@ export default function PaymentCard({ card, onAddToBasket, isInBasket, loading }
                 <span className="card-date">{formatDate(card.createdAt)}</span>
             </div>
             <div className="card-actions">
-                <button 
+                <button
                     className={`card-add-btn ${isInBasket ? 'added' : ''}`}
                     onClick={() => !isInBasket && onAddToBasket(card._id)}
                     disabled={loading || isInBasket}
