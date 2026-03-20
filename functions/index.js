@@ -20,7 +20,21 @@ const connectDB = async () => {
     return;
   }
 
-  const uri = process.env.MONGO_URI || functions.config().mongo?.uri || 'mongodb+srv://scott:314159265359@indexess.bq2wcic.mongodb.net/utility-app?appName=Indexess';
+  let uri = process.env.MONGO_URI;
+  if (!uri) {
+    try {
+      // Safe check for Firebase config
+      if (typeof functions.config === 'function') {
+        uri = functions.config().mongo?.uri;
+      }
+    } catch (e) {
+      console.log('Firebase config not available');
+    }
+  }
+
+  if (!uri) {
+    uri = 'mongodb+srv://scott:314159265359@indexess.bq2wcic.mongodb.net/utility-app?appName=Indexess';
+  }
 
   console.log('MongoDB connecting...');
   await mongoose.connect(uri, {
