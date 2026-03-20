@@ -122,21 +122,31 @@ export default function DashboardPage() {
 
             <main className="dashboard-content">
                 <div className="filter-bar">
-                    <select className="filter-select" value={category} onChange={e => { setCategory(e.target.value); setPage(1); }}>
-                        <option value="all">Все категории</option>
-                        <option value="electricity">Электричество</option>
-                        <option value="water">Вода</option>
-                        <option value="internet">Интернет</option>
-                        <option value="gas">Газ</option>
-                    </select>
+                    <div className="filter-group">
+                        <label>Категория</label>
+                        <select value={category} onChange={e => { setCategory(e.target.value); setPage(1); }}>
+                            <option value="all">Все</option>
+                            <option value="electricity">Электричество</option>
+                            <option value="water">Вода</option>
+                            <option value="internet">Интернет</option>
+                            <option value="gas">Газ</option>
+                        </select>
+                    </div>
 
-                    <select className="filter-select" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}>
-                        <option value="all">Любой статус</option>
-                        <option value="pending">Ожидает</option>
-                        <option value="paid">Оплачено</option>
-                        <option value="overdue">Просрочено</option>
-                    </select>
+                    <div className="filter-group">
+                        <label>Статус</label>
+                        <select value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}>
+                            <option value="all">Любой</option>
+                            <option value="pending">Ожидает</option>
+                            <option value="paid">Оплачено</option>
+                            <option value="overdue">Просрочено</option>
+                        </select>
+                    </div>
 
+                    <div className="navbar-spacer" />
+                </div>
+
+                <div className="filter-bar">
                     <button className={`sort-btn ${sort === 'amount' ? 'active' : ''}`} onClick={() => handleSort('amount')}>
                         По сумме {sort === 'amount' && (order === 'asc' ? <FiChevronUp /> : <FiChevronDown />)}
                     </button>
@@ -145,43 +155,45 @@ export default function DashboardPage() {
                     </button>
                 </div>
 
-                {loading ? (
-                    <div className="cards-grid">
-                        {[...Array(LIMIT)].map((_, i) => <SkeletonCard key={i} />)}
-                    </div>
-                ) : (
-                    <>
-                        <div className="cards-header">
-                            <h2>Найдено счетов: {total}</h2>
-                        </div>
+                {
+                    loading ? (
                         <div className="cards-grid">
-                            {cards.map(card => (
-                                <PaymentCard
-                                    key={card._id}
-                                    card={card}
-                                    onAddToBasket={handleAddToBasket}
-                                    isInBasket={basketItems.some(item => (item.cardId?._id || item.cardId) === card._id)}
-                                    loading={basketLoading}
-                                />
-                            ))}
+                            {[...Array(LIMIT)].map((_, i) => <SkeletonCard key={i} />)}
                         </div>
-
-                        {pages > 1 && (
-                            <div className="pagination">
-                                {[...Array(pages)].map((_, i) => (
-                                    <button
-                                        key={i + 1}
-                                        className={`page-btn ${page === i + 1 ? 'active' : ''}`}
-                                        onClick={() => setPage(i + 1)}
-                                    >
-                                        {i + 1}
-                                    </button>
+                    ) : (
+                        <>
+                            <div className="cards-header">
+                                <h2>Найдено счетов: {total}</h2>
+                            </div>
+                            <div className="cards-grid">
+                                {cards.map(card => (
+                                    <PaymentCard
+                                        key={card._id}
+                                        card={card}
+                                        onAddToBasket={handleAddToBasket}
+                                        isInBasket={basketItems.some(item => (item.cardId?._id || item.cardId) === card._id)}
+                                        loading={basketLoading}
+                                    />
                                 ))}
                             </div>
-                        )}
-                    </>
-                )}
-            </main>
+
+                            {pages > 1 && (
+                                <div className="pagination">
+                                    {[...Array(pages)].map((_, i) => (
+                                        <button
+                                            key={i + 1}
+                                            className={`page-btn ${page === i + 1 ? 'active' : ''}`}
+                                            onClick={() => setPage(i + 1)}
+                                        >
+                                            {i + 1}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    )
+                }
+            </main >
 
             <BasketPanel
                 isOpen={basketOpen}
@@ -203,7 +215,7 @@ export default function DashboardPage() {
                     <div key={t.id} className={`toast ${t.type}`}>{t.message}</div>
                 ))}
             </div>
-        </div>
+        </div >
     );
 
     function handleSort(field) {
