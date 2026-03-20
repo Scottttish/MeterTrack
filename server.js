@@ -185,10 +185,53 @@ app.delete('/api/system/indexes/:collection/:name', async (req, res) => {
     try {
         const { collection, name } = req.params;
         const db = mongoose.connection.db;
+        if (name === '_id_') return res.status(400).json({ message: 'Cannot drop _id index' });
         await db.collection(collection).dropIndex(name);
         res.json({ message: 'Index dropped', name });
     } catch (err) {
         res.status(500).json({ message: 'Failed to drop index', error: err.message });
+    }
+});
+
+app.post('/api/system/restore-defaults', async (req, res) => {
+    try {
+        const db = mongoose.connection.db;
+        const collections = ['paymentcards', 'users'];
+        const log = [];
+
+        for (const colName of collections) {
+            const col = db.collection(colName);
+            const indexes = await col.indexes();
+
+            // 1. Drop all non-standard indexes
+            for (const idx of indexes) {
+                if (idx.name !== '_id_') {
+                    try {
+                        await col.dropIndex(idx.name);
+                        log.push(`Dropped ${colName}.${idx.name}`);
+                    } catch (e) { log.push(`Error dropping ${colName}.${idx.name}: ${e.message}`); }
+                }
+            }
+
+            // 2. Create defaults based on models
+            if (colName === 'paymentcards') {
+                await col.createIndex({ userId: 1, createdAt: -1 });
+                await col.createIndex({ userId: 1, category: 1 });
+                await col.createIndex({ userId: 1, status: 1 });
+                await col.createIndex({ userId: 1, amount: -1 });
+                await col.createIndex({ title: 'text', provider: 'text', description: 'text' }, { name: 'text_search' });
+                await col.createIndex({ dueDate: 1 });
+                log.push(`Restored defaults for ${colName}`);
+            } else if (colName === 'users') {
+                await col.createIndex({ email: 1 }, { unique: true });
+                await col.createIndex({ nickname: 1 });
+                await col.createIndex({ createdAt: -1 });
+                log.push(`Restored defaults for ${colName}`);
+            }
+        }
+        res.json({ message: 'Defaults restored', log });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to restore defaults', error: err.message });
     }
 });
 

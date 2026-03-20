@@ -151,33 +151,23 @@ export default function IndexOptimizerWidget() {
     };
 
     const revert = async () => {
-        // We revert by comparing current results with initialIndexes
-        const currentRecs = recs.filter(r => r.action !== 'keep' && opStatus[r.index] === 'done');
-        if (!currentRecs.length) return;
-
-        for (const rec of currentRecs) {
-            setOpStatus(p => ({ ...p, [rec.index]: 'loading' }));
-            await sleep(200);
-            try {
-                if (rec.action === 'add') {
-                    // It was added, so delete it to revert
-                    await api.delete(`/api/system/indexes/${rec.collection}/${encodeURIComponent(rec.index)}`);
-                } else if (rec.action === 'delete') {
-                    // It was deleted, so re-add it to revert using its original keys
-                    const keys = rec.mongoKeys || {};
-                    if (!Object.keys(keys).length && rec.keys) {
-                        rec.keys.forEach(k => { keys[k.field] = k.dir === 'asc' || k.dir === 1 ? 1 : k.dir === 'text' ? 'text' : -1; });
-                    }
-                    await api.post('/api/system/indexes', { collection: rec.collection, keys });
-                }
-                setOpStatus(p => ({ ...p, [rec.index]: 'reverted' }));
-                setOpLog(p => [...p, { name: rec.index, action: 'откат', ok: true }]);
-            } catch (err) {
-                setOpStatus(p => ({ ...p, [rec.index]: 'error' }));
-                setOpLog(p => [...p, { name: rec.index, action: 'ошибка отката', ok: false, msg: err.message }]);
-            }
+        setRunning(true);
+        setOpLog(p => [...p, { name: 'СИСТЕМА', action: 'восстановление...', ok: true }]);
+        try {
+            await api.post('/api/system/restore-defaults');
+            setOpLog(p => [...p, { name: 'СИСТЕМА', action: 'заводские настройки применены', ok: true }]);
+            setApplied(false);
+            setOpStatus({});
+            // Force refetch
+            const { data } = await api.get('/api/system/indexes');
+            setIndexes(data || []);
+            setRecs([]);
+            setMaxStep(1);
+            setStep(1);
+        } catch (e) {
+            setOpLog(p => [...p, { name: 'ОШИБКА', action: 'сбой восстановления', ok: false }]);
         }
-        setApplied(false);
+        setRunning(false);
     };
 
     const reset = () => { setStep(null); setMaxStep(-1); setMetrics(null); setIndexes([]); setRecs([]); setApplied(false); setOpLog([]); setOpStatus({}); setRawStats({}); };
