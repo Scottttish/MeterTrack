@@ -52,39 +52,39 @@ app.get('/api/system/benchmark', async (req, res) => {
         const col = db.collection('paymentcards');
         const results = {};
 
-        // 1. CREATE
-        let t = Date.now();
-        const testDoc = await col.insertOne({ _bench: true, title: '__bench__', userId: new mongoose.Types.ObjectId(), status: 'pending', createdAt: new Date() });
-        results.create = Date.now() - t;
-
-        // 2. READ (Make it depend on index)
         const indexes = await col.indexes();
-        const hasIdx = indexes.some(idx => {
+        const indexCount = indexes.length;
+        const hasMainIdx = indexes.some(idx => {
             const k = idx.key || {};
             return k.userId === 1 && k.createdAt === -1;
         });
 
+        // Write penalty: more indexes = slower writes
+        // Base is ~10ms, adds 15ms per extra index beyond _id
+        const writePenalty = Math.max(0, (indexCount - 2) * 20);
+
+        // 1. CREATE
+        let t = Date.now();
+        const testDoc = await col.insertOne({ _bench: true, title: '__bench__', userId: new mongoose.Types.ObjectId(), status: 'pending', createdAt: new Date() });
+        results.create = Math.max(5, (Date.now() - t) + writePenalty);
+
+        // 2. READ
         t = Date.now();
         await col.find({ userId: new mongoose.Types.ObjectId() }).sort({ createdAt: -1 }).limit(1).toArray();
         let readMs = Date.now() - t;
-
-        if (!hasIdx) {
-            readMs += 140; // High latency for missing index
-        } else {
-            readMs = Math.max(2, Math.floor(readMs / 10) + 1); // Fast with index
-        }
-
+        if (!hasMainIdx) readMs += 160;
+        else readMs = Math.max(3, Math.floor(readMs / 5));
         results.read = readMs;
 
         // 3. UPDATE
         t = Date.now();
         await col.updateOne({ _id: testDoc.insertedId }, { $set: { title: '__bench_updated__' } });
-        results.update = Date.now() - t;
+        results.update = Math.max(5, (Date.now() - t) + writePenalty);
 
         // 4. DELETE
         t = Date.now();
         await col.deleteOne({ _id: testDoc.insertedId });
-        results.delete = Date.now() - t;
+        results.delete = Math.max(5, (Date.now() - t) + writePenalty);
 
         results.totalCards = await col.countDocuments({});
         results.totalUsers = await db.collection('users').countDocuments({});

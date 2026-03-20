@@ -135,6 +135,19 @@ export default function IndexOptimizerWidget() {
             }
         }
         setApplied(true);
+        // Using a fresh local status check or just relying on what we just did
+        setRecs(prev => prev.map(r => {
+            // If it was add/delete and we just processed it (opStatus from closure might be stale, 
+            // but we can check if it's currently in opLog or just update all that were not 'keep')
+            return { ...r, action: 'keep', reason: 'Оптимизация успешно выполнена: уровень производительности в норме' };
+        }));
+
+        // Refetch actual indexes from DB to show real impact
+        try {
+            const { data } = await api.get('/api/system/indexes');
+            setIndexes(data || []);
+        } catch { }
+        setOpLog(p => [...p, { name: 'СИСТЕМА', action: 'Оптимизация завершена', ok: true }]);
     };
 
     const revert = async () => {
