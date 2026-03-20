@@ -256,18 +256,12 @@ export default function IndexOptimizerWidget() {
                                             <span className='wo-ms'>…</span>
                                         </div>
                                     ))}
-                                    <button className='wo-button secondary' onClick={revert} disabled={running}>
-                                        Откатить
-                                    </button>
-                                    <button className='wo-button' style={{ background: 'transparent', fontSize: '10px', opacity: 0.5 }} onClick={restoreDefaults} disabled={running}>
-                                        Сброс настроек
-                                    </button>
                                     <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', marginTop: 8 }}>Выполняется реальный запрос к MongoDB…</p>
                                 </div>
                             ) : (
                                 <div className='wo-bars'>
                                     {[['CREATE', metrics.create], ['READ', metrics.read], ['UPDATE', metrics.update], ['DELETE', metrics.delete]].map(([op, ms]) => (
-                                        <div key={op} style={{ marginBottom: op === 'READ' && metrics.readStats ? '20px' : '12px' }}>
+                                        <div key={op}>
                                             <div className='wo-bar-row' style={{ alignItems: 'center' }}>
                                                 <span className='wo-op'>{op}</span>
                                                 <div className='wo-track'>
@@ -282,16 +276,6 @@ export default function IndexOptimizerWidget() {
                                                     <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)' }}>мс</span>
                                                 </div>
                                             </div>
-                                            {op === 'READ' && metrics.readStats && (
-                                                <div className="wo-stats-detail" style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginTop: '4px', textAlign: 'left', fontWeight: '500', paddingLeft: '65px' }}>
-                                                    <span>Документов: {metrics.readStats.docsExamined}</span>
-                                                    <span style={{ margin: '0 6px' }}>|</span>
-                                                    <span>Ключей: {metrics.readStats.keysExamined}</span>
-                                                    {metrics.readStats.docsExamined > metrics.readStats.keysExamined && (
-                                                        <span style={{ color: '#ff4757', marginLeft: '6px' }}>⚠ Неэффективный скан</span>
-                                                    )}
-                                                </div>
-                                            )}
                                         </div>
                                     ))}
                                     <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)' }}>
@@ -332,14 +316,19 @@ export default function IndexOptimizerWidget() {
                     {step === 2 && (
                         <div className='wo-section'>
                             <div className='wo-sec-title'><FiSearch size={12} /> Анализ через $indexStats</div>
-                            {colStats.length > 0 && (
-                                <div className='wo-stats-row'>
-                                    {colStats.map(([col, s]) => !s.error && (
-                                        <div key={col} className='wo-stat-chip'>
-                                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.6rem' }}>{col}</span>
-                                            <strong style={{ color: '#e8eaf0' }}>{s.docCount?.toLocaleString()}</strong> doc
-                                        </div>
-                                    ))}
+                            {recs.length > 0 && (
+                                <div style={{
+                                    padding: '8px 12px',
+                                    background: 'rgba(61,198,255,0.1)',
+                                    borderLeft: '3px solid #3dc6ff',
+                                    borderRadius: '8px',
+                                    marginBottom: '12px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '600',
+                                    color: '#e8eaf0',
+                                    boxShadow: '0 4px 12px rgba(61,198,255,0.1)'
+                                }}>
+                                    Рекомендуется: Добавить {recs.filter(r => r.action === 'add').length} и Удалить {recs.filter(r => r.action === 'delete').length} индексов
                                 </div>
                             )}
                             <div className='wo-list'>
@@ -387,7 +376,12 @@ export default function IndexOptimizerWidget() {
                                 <button className={`wo-btn-apply ${applied ? 'applied' : ''}`} onClick={applyChanges} disabled={running || !recs.some(r => r.action !== 'keep')}>
                                     <FiCheckCircle size={13} /> {applied ? 'Применено' : 'Применить'}
                                 </button>
-                                <button className='wo-btn-revert' onClick={revert}><FiRefreshCw size={13} /> Откатить</button>
+                                <button className='wo-btn-revert' onClick={revert} disabled={running}>
+                                    <FiRefreshCw size={13} /> Откатить
+                                </button>
+                                <button className='wo-icon-btn' style={{ opacity: 0.3 }} onClick={restoreDefaults} title="Полный сброс до заводских">
+                                    <FiTrash2 size={12} />
+                                </button>
                             </div>
                             {opLog.length > 0 && (
                                 <div className='wo-log'>
