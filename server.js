@@ -90,33 +90,42 @@ app.get('/api/system/analyze', async (req, res) => {
                 for (const idx of indexes) {
                     const ops = accessMap[idx.name] || 0;
                     const keys = idx.key ? Object.entries(idx.key) : [];
-                    const keyStr = keys.map(([f, d]) => `${f}:${d}`).join(', ');
+                    const keyStr = keys.map(([f, d]) => `${f} ${d === 1 ? 'возрастание' : 'убывание'}`).join(' и ');
+
                     if (idx.name === '_id_') {
                         recommendations.push({
                             action: 'keep', index: idx.name, collection: colName, ops,
-                            reason: `Системный индекс. $indexStats: ${ops.toLocaleString()} обращений. Структура: ${keyStr}.`,
+                            reason: `Этот системный индекс по полю идентификатора является критически важным для целостности коллекции ${colName} и обеспечивает мгновенный доступ к документам по их уникальному ключу поэтому его необходимо оставить в базе данных без изменений`,
                             impact: 'critical', keys: keys.map(([f, d]) => ({ field: f, dir: d })),
                         });
                         continue;
                     }
-                    if (ops === 0) {
+
+                    if (ops === 0 && docCount > 50) {
                         recommendations.push({
                             action: 'delete', index: idx.name, collection: colName, ops,
-                            reason: `$indexStats показывает 0 обращений. На коллекции "${colName}" (${docCount.toLocaleString()} документов) он замедляет запись. Данные: ${keyStr}.`,
+                            reason: `Индекс по полям ${keyStr} не зафиксировал ни одного обращения к данным за весь период мониторинга при этом он занимает место в оперативной памяти и замедляет выполнение операций вставки и обновления в коллекции из ${docCount.toLocaleString()} документов`,
+                            impact: 'high', keys: keys.map(([f, d]) => ({ field: f, dir: d })),
+                        });
+                    } else if (ops < 20 && docCount > 500) {
+                        recommendations.push({
+                            action: 'delete', index: idx.name, collection: colName, ops,
+                            reason: `Данный индекс используется крайне редко всего ${ops} операций на большой объем данных что не оправдывает затраты ресурсов сервера на его поддержку и обновление при изменении документов в коллекции ${colName}`,
                             impact: 'medium', keys: keys.map(([f, d]) => ({ field: f, dir: d })),
                         });
                     } else {
                         recommendations.push({
                             action: 'keep', index: idx.name, collection: colName, ops,
-                            reason: `Используемый индекс: ${ops.toLocaleString()} обращений. Поля: ${keyStr}.`,
-                            impact: ops > 500 ? 'high' : 'low', keys: keys.map(([f, d]) => ({ field: f, dir: d })),
+                            reason: `Этот индекс демонстрирует высокую эффективность показав ${ops.toLocaleString()} успешных обращений к данным что позволяет MongoDB мгновенно находить нужные записи по полям ${keyStr} избегая полного сканирования коллекции`,
+                            impact: 'low', keys: keys.map(([f, d]) => ({ field: f, dir: d })),
                         });
                     }
                 }
+
                 if (colName === 'paymentcards' && !indexes.some(n => n.name.includes('userId'))) {
                     recommendations.push({
                         action: 'add', index: 'userId_1_createdAt_-1', collection: colName, ops: 0,
-                        reason: `Отсутствует индекс для дашборда. Без него MongoDB выполняет COLLSCAN по всем ${docCount.toLocaleString()} документам.`,
+                        reason: `Обнаружено отсутствие индекса по идентификатору пользователя и дате создания что заставляет базу данных проверять каждую запись при загрузке дашборда создание этого индекса ускорит отображение истории платежей для ваших клиентов в несколько раз`,
                         impact: 'high', keys: [{ field: 'userId', dir: 1 }, { field: 'createdAt', dir: -1 }],
                         mongoKeys: { userId: 1, createdAt: -1 }
                     });

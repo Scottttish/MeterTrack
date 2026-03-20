@@ -4,7 +4,7 @@ import api from '../services/api';
 
 const STEPS = ['Нагрузка', 'Индексы', 'Анализ', 'Применение'];
 const A_COLOR = { keep: '#1dd1a1', add: '#3dc6ff', delete: '#ff6b81' };
-const A_LABEL = { keep: 'Оставить', add: 'Добавить', delete: 'Удалить' };
+const A_LABEL = { keep: 'оставить', add: 'добавить', delete: 'удалить' };
 const IMP_CLR = { critical: '#ff4757', high: '#1dd1a1', medium: '#ffa502', low: '#747d8c' };
 const IMP_LBL = { critical: 'Критично', high: 'Важно', medium: 'Умеренно', low: 'Низко' };
 
@@ -185,7 +185,7 @@ export default function IndexOptimizerWidget() {
                     {/* Step 0 – Нагрузка */}
                     {step === 0 && (
                         <div className='wo-section'>
-                            <div className='wo-sec-title'><FiZap size={12} /> Реальный бенчмарк CRUD</div>
+                            <div className='wo-sec-title'><FiZap size={12} /> Бенчмарк CRUD</div>
                             {!metrics ? (
                                 <div className='wo-bars'>
                                     {['CREATE', 'READ', 'UPDATE', 'DELETE'].map(op => (
@@ -200,10 +200,13 @@ export default function IndexOptimizerWidget() {
                             ) : (
                                 <div className='wo-bars'>
                                     {[['CREATE', metrics.create], ['READ', metrics.read], ['UPDATE', metrics.update], ['DELETE', metrics.delete]].map(([op, ms]) => (
-                                        <div key={op} className='wo-bar-row'>
+                                        <div key={op} className='wo-bar-row' style={{ alignItems: 'baseline' }}>
                                             <span className='wo-op'>{op}</span>
                                             <div className='wo-track'><div className='wo-fill' style={{ width: `${Math.min(ms * 1.5, 100)}%`, background: ms > 100 ? '#ff4757' : ms > 50 ? '#ffa502' : '#1dd1a1' }} /></div>
-                                            <span className='wo-ms'>{typeof ms === 'number' ? `${ms} мс` : ms}</span>
+                                            <div className='wo-ms' style={{ display: 'flex', alignItems: 'baseline', gap: 2, justifyContent: 'flex-end', minWidth: 50 }}>
+                                                <span style={{ fontWeight: 800 }}>{typeof ms === 'number' ? ms : ms}</span>
+                                                <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>мс</span>
+                                            </div>
                                         </div>
                                     ))}
                                     <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)' }}>
@@ -219,7 +222,7 @@ export default function IndexOptimizerWidget() {
                     {/* Step 1 – Индексы */}
                     {step === 1 && (
                         <div className='wo-section'>
-                            <div className='wo-sec-title'><FiSearch size={12} /> Индексы MongoDB ({indexes.length})</div>
+                            <div className='wo-sec-title'><FiSearch size={12} /> Итого индексов ({indexes.length})</div>
                             <div className='wo-list'>
                                 {indexes.map((idx, i) => {
                                     const keys = idx.key ? Object.entries(idx.key) : [];
@@ -282,10 +285,16 @@ export default function IndexOptimizerWidget() {
                     {step === 3 && (
                         <div className='wo-section'>
                             <div className='wo-sec-title'><FiCheck size={12} /> Применение изменений</div>
-                            <div className='wo-chips'>
-                                <span className='wo-chip wo-chip-add'><FiPlus size={10} /> {recs.filter(r => r.action === 'add').length} добавить</span>
-                                <span className='wo-chip wo-chip-del'><FiTrash2 size={10} /> {recs.filter(r => r.action === 'delete').length} удалить</span>
-                                <span className='wo-chip wo-chip-keep'><FiCheck size={10} /> {recs.filter(r => r.action === 'keep').length} оставить</span>
+                            <div className='wo-chips' style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+                                <span className='wo-chip wo-chip-add' style={{ background: 'rgba(61,198,255,0.1)', color: '#3dc6ff', padding: '4px 10px', borderRadius: 8, fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    <FiPlus size={10} /> {recs.filter(r => r.action === 'add').length} <span style={{ fontWeight: 600 }}>добавить</span>
+                                </span>
+                                <span className='wo-chip wo-chip-del' style={{ background: 'rgba(255,71,87,0.1)', color: '#ff4757', padding: '4px 10px', borderRadius: 8, fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    <FiTrash2 size={10} /> {recs.filter(r => r.action === 'delete').length} <span style={{ fontWeight: 600 }}>удалить</span>
+                                </span>
+                                <span className='wo-chip wo-chip-keep' style={{ background: 'rgba(29,209,161,0.1)', color: '#1dd1a1', padding: '4px 10px', borderRadius: 8, fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    <FiCheck size={10} /> {recs.filter(r => r.action === 'keep').length} <span style={{ fontWeight: 600 }}>оставить</span>
+                                </span>
                             </div>
                             {!applied && <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5, marginBottom: 10 }}>Нажмите <strong style={{ color: '#e8eaf0' }}>Применить</strong> — выполнятся реальные создание/удаление индексов в MongoDB.</p>}
                             {applied && <div className='wo-notice-ok'><FiCheckCircle size={13} /> Изменения применены в MongoDB</div>}
