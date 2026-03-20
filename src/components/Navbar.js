@@ -2,23 +2,12 @@ import React from 'react';
 import { FiSearch, FiShoppingCart } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
-const AppIcon = () => (
-    <svg viewBox="0 0 24 24" width="34" height="34" fill="var(--app-blue)" xmlns="http://www.w3.org/2000/svg">
-        <rect width="24" height="24" rx="4" />
-        <text x="3" y="18" fontSize="14" fontWeight="900" fill="white" fontFamily="Arial, sans-serif">UA</text>
-    </svg>
-);
-
 export default function Navbar({ onBasketClick, basketCount, onProfileClick, searchValue, onSearchChange }) {
     const { user } = useAuth();
     const initials = user?.nickname?.substring(0, 2)?.toUpperCase() || 'U';
 
     return (
         <nav className="navbar">
-            <div className="navbar-logo">
-                <AppIcon />
-            </div>
-
             <div className="navbar-search">
                 <FiSearch className="navbar-search-icon" />
                 <input

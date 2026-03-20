@@ -4,12 +4,6 @@ import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { register as registerService } from '../services/authService';
 
-const AppLogo = () => (
-    <svg viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
-        <text x="0" y="32" fontSize="28" fontWeight="800" fill="var(--app-blue)" fontFamily="Inter, sans-serif">UtilityApp</text>
-    </svg>
-);
-
 export default function RegisterPage() {
     const [form, setForm] = useState({ nickname: '', email: '', password: '', confirm: '' });
     const [showPass, setShowPass] = useState(false);
@@ -41,7 +35,6 @@ export default function RegisterPage() {
 
     return (
         <div className="auth-page">
-            <div className="auth-logo"><AppLogo /></div>
             <div className="auth-card">
                 <h1>Создать аккаунт</h1>
                 <p className="auth-subtitle">Управляйте коммунальными платежами удобно</p>

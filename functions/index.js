@@ -24,8 +24,16 @@ const connectDB = async () => {
 };
 
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection error:', err);
+    res.status(500).json({
+      message: 'Database connection failed. Please ensure your IP is whitelisted.',
+      error: err.message
+    });
+  }
 });
 
 app.use('/api/auth', authRoutes);

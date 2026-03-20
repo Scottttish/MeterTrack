@@ -4,12 +4,6 @@ import { FiMail, FiEye, FiEyeOff } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { login as loginService } from '../services/authService';
 
-const AppLogo = () => (
-    <svg viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
-        <text x="0" y="32" fontSize="28" fontWeight="800" fill="var(--app-blue)" fontFamily="Inter, sans-serif">UtilityApp</text>
-    </svg>
-);
-
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -37,7 +31,6 @@ export default function LoginPage() {
 
     return (
         <div className="auth-page">
-            <div className="auth-logo"><AppLogo /></div>
             <div className="auth-card">
                 <h1>Добро пожаловать</h1>
                 <p className="auth-subtitle">Войдите в систему управления коммунальными платежами</p>
