@@ -29,14 +29,9 @@ export default function PaymentCard({ card, onAddToBasket, isInBasket, loading }
     const cat = CATEGORY_CONFIG[card.category] || CATEGORY_CONFIG.other;
 
     return (
-        <div
-            className="payment-card"
-            style={{ '--card-accent': cat.color, '--icon-bg': cat.bg }}
-        >
+        <div className="payment-card" style={{ '--card-accent': cat.color, '--icon-bg': cat.bg }}>
             <div className="card-header">
-                <div className="card-icon" style={{ color: cat.color }}>
-                    {cat.icon}
-                </div>
+                <div className="card-icon" style={{ color: cat.color }}>{cat.icon}</div>
                 <div className="card-info">
                     <div className="card-title">{card.title}</div>
                     <div className="card-provider">{card.provider}</div>
@@ -45,32 +40,18 @@ export default function PaymentCard({ card, onAddToBasket, isInBasket, loading }
                     {cat.label}
                 </div>
             </div>
-
-            <div className="card-amount">
-                {formatAmount(card.amount, card.currency)}
-            </div>
-
+            <div className="card-amount">{formatAmount(card.amount, card.currency)}</div>
             <div className="card-meta">
-                <span className={`card-status ${card.status}`}>
-                    <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: 'currentColor' }} />
-                    {STATUS_LABELS[card.status]}
-                </span>
+                <span className={`card-status ${card.status}`}>{STATUS_LABELS[card.status]}</span>
                 <span className="card-date">{formatDate(card.createdAt)}</span>
             </div>
-
-            {card.dueDate && (
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    Срок: {formatDate(card.dueDate)}
-                </div>
-            )}
-
             <div className="card-actions">
-                <button
+                <button 
                     className={`card-add-btn ${isInBasket ? 'added' : ''}`}
                     onClick={() => !isInBasket && onAddToBasket(card._id)}
                     disabled={loading || isInBasket}
                 >
-                    {isInBasket ? <><FiCheck /> Добавлено</> : <><FiPlus /> Добавить в корзину</>}
+                    {isInBasket ? <><FiCheck /> Добавлено</> : <><FiPlus /> В корзину</>}
                 </button>
             </div>
         </div>
