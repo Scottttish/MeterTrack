@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
-import { FiSearch, FiPlus, FiChevronUp, FiChevronDown } from 'react-icons/fi';
+import { FiChevronUp, FiChevronDown } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { getCards } from '../services/cardsService';
 import { getBasket, addToBasket, removeFromBasket } from '../services/basketService';

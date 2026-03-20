@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiSearch, FiBriefcase, FiShoppingCart, FiUser, FiBell, FiPlusSquare } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
 const LinkedInIcon = () => (
