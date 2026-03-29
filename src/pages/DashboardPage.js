@@ -92,10 +92,6 @@ export default function DashboardPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, sort, category]); // only on auth or explicit filter change
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
-    }
-
     const handleSearchChange = (val) => {
         setSearch(val);
         clearTimeout(searchTimer.current);
@@ -151,6 +147,10 @@ export default function DashboardPage() {
         setPage(1);
         fetchCards(search, 1, sort, category, false);
     };
+
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
 
     return (
         <div className="dashboard">
