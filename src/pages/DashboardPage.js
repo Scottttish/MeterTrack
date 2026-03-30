@@ -167,7 +167,7 @@ export default function DashboardPage() {
             <main className="dashboard-content">
                 <div className="navbar-spacer" />
 
-                <div className="filter-bar">
+                <div className="filter-bar" style={{ padding: '24px 32px', alignItems: 'center' }}>
                     <select className="filter-select" value={category} onChange={e => setCategory(e.target.value)}>
                         <option value="all">Все категории</option>
                         <option value="electricity">Электроэнергия</option>
@@ -187,7 +187,6 @@ export default function DashboardPage() {
                     <div style={{flex: 1}}></div>
 
                     <div className="sort-controls" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Сортировка:</span>
                         <select className="filter-select" value={sort} onChange={e => setSort(e.target.value)}>
                             <option value="createdAt">По дате</option>
                             <option value="amount">По сумме</option>

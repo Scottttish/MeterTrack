@@ -99,7 +99,7 @@ export default function ProfilePanel({ isOpen, onClose, onToast }) {
                         </div>
 
                         <div className="profile-actions">
-                            <button type="submit" className="btn-save" disabled={loading}>
+                            <button type="submit" className="btn-primary" disabled={loading} style={{ marginBottom: '16px' }}>
                                 <FiSave /> {loading ? 'Сохранение...' : 'Сохранить изменения'}
                             </button>
                         </div>

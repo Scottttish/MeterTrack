@@ -24,7 +24,10 @@ router.put('/', async (req, res) => {
             if (emailExists) return res.status(400).json({ message: 'Email уже занят' });
             user.email = email.toLowerCase();
         }
-        if (nickname) user.nickname = nickname;
+        if (nickname !== undefined) {
+            if (nickname.trim().length < 2) return res.status(400).json({ message: 'Никнейм должен быть не короче 2 символов' });
+            user.nickname = nickname.trim();
+        }
         if (password) {
             if (!currentPassword) return res.status(400).json({ message: 'Введите текущий пароль' });
             const isMatch = await user.comparePassword(currentPassword);
@@ -36,7 +39,11 @@ router.put('/', async (req, res) => {
         res.json(user.toJSON());
     } catch (err) {
         console.error('Update profile error:', err);
-        res.status(500).json({ message: 'Ошибка обновления профиля' });
+        if (err.name === 'ValidationError') {
+            const messages = Object.values(err.errors).map(e => e.message);
+            return res.status(400).json({ message: messages.join(', ') });
+        }
+        res.status(500).json({ message: 'Ошибка обновления профиля: ' + err.message });
     }
 });
 
