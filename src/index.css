@@ -5,22 +5,22 @@
   --app-blue: #f3a333;
   --app-blue-dark: #d88c29;
   --app-blue-light: #f6b75c;
-  --bg-primary: #121212;
-  --bg-white: #1e1e1e;
-  --bg-dark: #000000;
-  --text-primary: var(--bg-white);
-  --text-secondary: #cccccc;
-  --text-muted: #888888;
-  --border-color: #333333;
-  --border-light: #2a2a2a;
+  --bg-primary: #f4f4f4;
+  --bg-white: #ffffff;
+  --bg-dark: #121212;
+  --text-primary: #2b2b2b;
+  --text-secondary: #6e6e6e;
+  --text-muted: #999999;
+  --border-color: #e0e0e0;
+  --border-light: #f0f0f0;
   --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 4px rgba(255, 255, 255, 0.05);
   --shadow-md: 0 4px 12px rgba(255, 255, 255, 0.12);
   --shadow-lg: 0 8px 32px rgba(255, 255, 255, 0.16);
   --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 9999px;
+  --radius-md: 14px;
+  --radius-lg: 14px;
+  --radius-xl: 14px;
+  --radius-full: 14px;
 
   /* Category colors */
   --cat-electricity: #F5A623;
@@ -118,7 +118,7 @@ select {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  border-radius: 14px;
   padding: 40px;
   width: 100%;
   max-width: 440px;
@@ -441,7 +441,7 @@ select {
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1.5px solid rgba(255, 255, 255, 0.06);
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -902,7 +902,7 @@ select {
   background: var(--primary);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 0.9rem;
   font-weight: 700;
   display: flex;
@@ -1852,7 +1852,7 @@ select {
 .page-btn {
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1.5px solid rgba(255, 255, 255, 0.08);
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -1905,7 +1905,7 @@ select {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1.5px solid transparent;
   background: transparent;
   color: var(--text-muted);
@@ -2198,7 +2198,7 @@ select {
 .wo-rec {
   padding: 12px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
@@ -2275,7 +2275,7 @@ select {
   gap: 8px;
   background: var(--bg-white);
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -2311,7 +2311,7 @@ select {
 .basket-item-icon {
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;

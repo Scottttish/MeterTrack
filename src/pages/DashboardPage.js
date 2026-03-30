@@ -22,7 +22,9 @@ export default function DashboardPage() {
     
     // Sort and Filter state
     const [sort, setSort] = useState('createdAt');
+    const [order, setOrder] = useState('desc');
     const [category, setCategory] = useState('all');
+    const [status, setStatus] = useState('all');
 
     const [basketItems, setBasketItems] = useState([]);
     const [basketLoading, setBasketLoading] = useState(false);
@@ -41,7 +43,7 @@ export default function DashboardPage() {
         setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
     }, []);
 
-    const fetchCards = useCallback(async (currentSearch, currentPage, currentSort, currentCategory, append = false) => {
+    const fetchCards = useCallback(async (currentSearch, currentPage, currentSort, currentCategory, currentStatus, currentOrder, append = false) => {
         if (!isAuthenticated) return;
         if (append) setLoadingMore(true);
         else setLoading(true);
@@ -50,9 +52,9 @@ export default function DashboardPage() {
             const data = await getCards({
                 search: currentSearch,
                 category: currentCategory,
-                status: 'all',
+                status: currentStatus,
                 sort: currentSort,
-                order: 'desc',
+                order: currentOrder,
                 page: currentPage,
                 limit: LIMIT
             });
@@ -83,19 +85,19 @@ export default function DashboardPage() {
     // Initial load and filter changes
     useEffect(() => {
         if (isAuthenticated) {
-            fetchCards(search, 1, sort, category, false);
+            fetchCards(search, 1, sort, category, status, order, false);
             setPage(1);
             fetchBasket();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, sort, category]); // only on auth or explicit filter change
+    }, [isAuthenticated, sort, category, status, order]); // only on auth or explicit filter change
 
     const handleSearchChange = (val) => {
         setSearch(val);
         clearTimeout(searchTimer.current);
         searchTimer.current = setTimeout(() => {
             setPage(1);
-            fetchCards(val, 1, sort, category, false);
+            fetchCards(val, 1, sort, category, status, order, false);
         }, 400);
     };
     
@@ -103,7 +105,7 @@ export default function DashboardPage() {
         if (!loadingMore && hasMore && !loading) {
             const nextPage = page + 1;
             setPage(nextPage);
-            fetchCards(search, nextPage, sort, category, true);
+            fetchCards(search, nextPage, sort, category, status, order, true);
         }
     };
 
@@ -144,7 +146,7 @@ export default function DashboardPage() {
 
     const handleCardCreated = (newCard) => {
         setPage(1);
-        fetchCards(search, 1, sort, category, false);
+        fetchCards(search, 1, sort, category, status, order, false);
     };
 
     if (!isAuthenticated) {
@@ -174,14 +176,27 @@ export default function DashboardPage() {
                         <option value="internet">Интернет</option>
                     </select>
 
+                    <select className="filter-select" value={status} onChange={e => setStatus(e.target.value)}>
+                        <option value="all">Все статусы</option>
+                        <option value="pending">Ожидает</option>
+                        <option value="paid">Оплачено</option>
+                        <option value="overdue">Просрочено</option>
+                        <option value="cancelled">Отменено</option>
+                    </select>
+
                     <div style={{flex: 1}}></div>
 
-                    <button className={`sort-btn ${sort === 'createdAt' ? 'active' : ''}`} onClick={() => setSort('createdAt')}>
-                        По дате
-                    </button>
-                    <button className={`sort-btn ${sort === 'amount' ? 'active' : ''}`} onClick={() => setSort('amount')}>
-                        По сумме
-                    </button>
+                    <div className="sort-controls" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Сортировка:</span>
+                        <select className="filter-select" value={sort} onChange={e => setSort(e.target.value)}>
+                            <option value="createdAt">По дате</option>
+                            <option value="amount">По сумме</option>
+                        </select>
+                        <select className="filter-select" value={order} onChange={e => setOrder(e.target.value)}>
+                            <option value="desc">По убыванию</option>
+                            <option value="asc">По возрастанию</option>
+                        </select>
+                    </div>
                 </div>
 
                 {loading && page === 1 ? (
