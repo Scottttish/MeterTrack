@@ -16,11 +16,14 @@ app.use(express.json());
 // MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://admin:314159265359o@cluster.aqamzoa.mongodb.net/utility-app?appName=Cluster';
 
-mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 })
-    .then(() => console.log('✅ Connected to MongoDB Atlas'))
+mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 })
+    .then(() => console.log('✅ Connected to MongoDB Atlas:', MONGO_URI.split('@')[1]))
     .catch(err => {
-        console.error('❌ MongoDB connection error:', err);
-        // Do not crash the process, but allow health check to report failure
+        console.error('❌ MongoDB connection error details:', {
+            message: err.message,
+            code: err.code,
+            name: err.name
+        });
     });
 
 
